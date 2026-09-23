@@ -72,6 +72,25 @@ lib/
   mockDb.js                ⚠️ in-memory mock subscription store
 ```
 
+## What's new in this pass
+
+- **Logo** — `public/logo.png`, used in the floating nav, the hero, and as
+  the site favicon.
+- **Floating sticky nav** — a glass pill, fixed near the top, instead of a
+  full-width bar.
+- **"Get the extension" no longer sends people to the GitHub Releases
+  page.** It hits `/api/download`, which 302-redirects to whatever the
+  **latest** GitHub Release's `.zip` asset currently is (cached 5 minutes).
+  See `nexsion-extension-workflow.zip` (delivered separately) for the
+  companion GitHub Actions workflow that goes in the **extension's own
+  repo** — it auto-builds and publishes that zip every time you bump the
+  version in `manifest.json` and push to `main`.
+- **Animated install guide** (`/#install`) — a 6-step walkthrough (download →
+  unzip → `chrome://extensions` → Developer mode → Load unpacked → done),
+  each step fading in as you scroll. The icons are illustrative inline SVGs,
+  **not real screenshots** — swap `components/InstallGuide.js`'s icon
+  components for actual `<img>` screenshots whenever you have some.
+
 ## Notes on the share page
 
 `/s/[id]` reads from the exact same `nexsion_shares` Firestore collection
@@ -81,4 +100,3 @@ groups links by board (instead of flattening everything into one list like
 the earlier static `share-preview.html`), and if a link was a **page** share
 (multiple boards), visitors can deselect boards they don't want before
 copying the import code.
-"# NexSion-Website" 
