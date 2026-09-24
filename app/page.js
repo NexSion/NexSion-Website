@@ -1,6 +1,17 @@
 import InstallGuide from "../components/InstallGuide";
 import { GITHUB_REPO } from "../lib/site-config";
 
+const FEATURE_COLORS = [
+  ["#3b9eff", "#6366f1"],
+  ["#a855f7", "#6366f1"],
+  ["#10b981", "#0ea5e9"],
+  ["#ec4899", "#a855f7"],
+  ["#06b6d4", "#3b9eff"],
+  ["#f59e0b", "#ec4899"],
+  ["#8b5cf6", "#3b9eff"],
+  ["#0ea5e9", "#10b981"],
+];
+
 const FEATURES = [
   {
     icon: "🗂️",
@@ -44,9 +55,6 @@ const FEATURES = [
   },
 ];
 
-// Server-side fetch so the version badge is always accurate without shipping
-// a client bundle just to show a number. Fails quietly if GitHub is
-// unreachable or no release exists yet.
 async function getLatestVersion() {
   try {
     const res = await fetch(
@@ -67,40 +75,71 @@ export default async function HomePage() {
   return (
     <>
       <section className="hero container">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="" className="hero-logo" />
-        {version && <span className="hero-version-badge">{version}</span>}
-        <h1>
-          Your new tab, <span>reimagined</span>.
-        </h1>
-        <p>
-          NexSion turns every new tab into a visual, drag-and-drop bookmark
-          workspace — with cloud sync, sharing, wallpapers, and widgets built
-          right in.
-        </p>
-        <div className="hero-actions">
-          <a className="btn btn-primary" href="/api/download">
-            Get NexSion — Free
-          </a>
-          <a className="btn btn-secondary" href="#install">
-            How to install
-          </a>
+        <div className="hero-grid">
+          <div className="hero-text">
+            <div className="hero-badges">
+              {version && (
+                <span className="hero-badge-version">{version}</span>
+              )}
+              <span className="eyebrow">
+                <span className="eyebrow-dot" /> Now available
+              </span>
+            </div>
+            <h1>
+              Your new tab, <span>reimagined.</span>
+            </h1>
+            <p>
+              NexSion turns every new tab into a visual, drag-and-drop
+              bookmark workspace — with cloud sync, sharing, wallpapers, and
+              widgets built right in.
+            </p>
+            <div className="hero-actions">
+              <a className="btn btn-primary" href="/api/download">
+                Get NexSion — Free
+              </a>
+              <a className="btn btn-secondary" href="#install">
+                How to install
+              </a>
+            </div>
+          </div>
+
+          <div className="hero-visual">
+            <div className="hero-visual-ring" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" className="hero-visual-core" />
+            <div className="hero-chip hero-chip-1">🗂️ Boards</div>
+            <div className="hero-chip hero-chip-2">☁️ Synced</div>
+            <div className="hero-chip hero-chip-3">🔗 Shareable</div>
+            <div className="hero-chip hero-chip-4">🧩 Widgets</div>
+          </div>
         </div>
       </section>
 
       <section className="features container">
         <div className="section-head">
+          <span className="eyebrow" style={{ marginBottom: 14 }}>
+            Features
+          </span>
           <h2>Everything your new tab was missing</h2>
           <p>Free to use, with your data synced to your own Google account.</p>
         </div>
         <div className="features-grid">
-          {FEATURES.map((f) => (
-            <div className="feature-card" key={f.title}>
-              <span className="icon">{f.icon}</span>
-              <h3>{f.title}</h3>
-              <p>{f.text}</p>
-            </div>
-          ))}
+          {FEATURES.map((f, i) => {
+            const [a, b] = FEATURE_COLORS[i % FEATURE_COLORS.length];
+            return (
+              <div className="feature-card" key={f.title}>
+                <span className="feature-arrow">→</span>
+                <span
+                  className="feature-icon-badge"
+                  style={{ "--fc-a": a, "--fc-b": b }}
+                >
+                  {f.icon}
+                </span>
+                <h3>{f.title}</h3>
+                <p>{f.text}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 

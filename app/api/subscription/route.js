@@ -1,33 +1,28 @@
-import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../../lib/auth";
 import { getSubscription, setSubscription } from "../../../lib/mockDb";
 
-async function requireEmail() {
-  const session = await getServerSession(authOptions);
-  return session?.user?.email || null;
-}
-
-export async function GET() {
-  const email = await requireEmail();
+// ⚠️ MOCK — no server-side identity verification. The email comes straight
+// from the client (Firebase Auth's user object, or the extension's stored
+// profile), purely so the Pricing/Dashboard mockup has something to key
+// off of. This is fine for a UI mockup with no real money involved, but do
+// NOT ship this pattern once real billing exists — verify the caller
+// server-side first (e.g. check a Firebase ID token with the Admin SDK)
+// instead of trusting whatever email the request claims.
+export async function GET(req) {
+  const email = new URL(req.url).searchParams.get("email");
   if (!email) {
-    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+    return NextResponse.json({ error: "Missing email" }, { status: 400 });
   }
   return NextResponse.json(getSubscription(email));
 }
 
-// MOCK upgrade/downgrade — trusts the client-sent plan on purpose, because
-// there's no real payment provider wired up yet. Do not ship this endpoint
-// as-is once real billing exists; a real integration confirms the plan via a
-// webhook from the payment provider, not from the request body.
 export async function POST(req) {
-  const email = await requireEmail();
-  if (!email) {
-    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
-  }
   const body = await req.json().catch(() => ({}));
+  if (!body.email) {
+    return NextResponse.json({ error: "Missing email" }, { status: 400 });
+  }
   const plan = body.plan === "pro" ? "pro" : "free";
-  const sub = setSubscription(email, {
+  const sub = setSubscription(body.email, {
     plan,
     status: "active",
     renewsAt:

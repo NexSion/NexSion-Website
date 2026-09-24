@@ -1,36 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useNexSionAuth } from "../../components/Providers";
 import PlanCard from "../../components/PlanCard";
 import UpgradeModal from "../../components/UpgradeModal";
 
 export default function PricingPage() {
-  const { data: session, status } = useSession();
+  const { user, loading, signIn } = useNexSionAuth();
   const [subscription, setSubscription] = useState(null);
   const [modalPlan, setModalPlan] = useState(null); // "pro" | "free" | null
 
   useEffect(() => {
-    if (status !== "authenticated") return;
-    fetch("/api/subscription")
+    if (!user?.email) return;
+    fetch(`/api/subscription?email=${encodeURIComponent(user.email)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then(setSubscription)
       .catch(() => {});
-  }, [status]);
+  }, [user?.email]);
 
   async function confirmPlanChange() {
     const res = await fetch("/api/subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan: modalPlan }),
+      body: JSON.stringify({ email: user.email, plan: modalPlan }),
     });
     if (res.ok) setSubscription(await res.json());
     setModalPlan(null);
   }
 
   function handlePlanClick(plan) {
-    if (status !== "authenticated") {
-      signIn("google");
+    if (loading) return;
+    if (!user) {
+      signIn();
       return;
     }
     if (subscription?.plan === plan) return;
@@ -40,7 +41,7 @@ export default function PricingPage() {
   const currentPlan = subscription?.plan || "free";
 
   return (
-    <section className="container" style={{ padding: "60px 0 100px" }}>
+    <section className="container" style={{ padding: "150px 0 100px" }}>
       <div className="section-head">
         <h2>Simple pricing</h2>
         <p>Every feature works on Free. Pro just adds a few extras.</p>

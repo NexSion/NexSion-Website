@@ -1,41 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useNexSionAuth } from "../../components/Providers";
 import UpgradeModal from "../../components/UpgradeModal";
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  const { user, loading, source, signIn } = useNexSionAuth();
   const [subscription, setSubscription] = useState(null);
   const [modalPlan, setModalPlan] = useState(null);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
-    fetch("/api/subscription")
+    if (!user?.email) return;
+    fetch(`/api/subscription?email=${encodeURIComponent(user.email)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then(setSubscription)
       .catch(() => {});
-  }, [status]);
+  }, [user?.email]);
 
   async function confirmPlanChange() {
     const res = await fetch("/api/subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan: modalPlan }),
+      body: JSON.stringify({ email: user.email, plan: modalPlan }),
     });
     if (res.ok) setSubscription(await res.json());
     setModalPlan(null);
   }
 
-  if (status === "loading") {
+  if (loading) {
     return <div className="dash-empty">Loading…</div>;
   }
 
-  if (status !== "authenticated") {
+  if (!user) {
     return (
       <div className="dash-empty">
         <p>Sign in to see your account and subscription.</p>
-        <button className="btn btn-primary" onClick={() => signIn("google")}>
+        <button className="btn btn-primary" onClick={signIn}>
           Continue with Google
         </button>
       </div>
@@ -54,20 +54,24 @@ export default function DashboardPage() {
         <div className="dash-card">
           <h3>Profile</h3>
           <div className="dash-profile">
-            {session.user?.image && (
+            {user.picture && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img className="dash-avatar" src={session.user.image} alt="" />
+              <img className="dash-avatar" src={user.picture} alt="" />
             )}
             <div>
-              <div className="dash-name">{session.user?.name}</div>
-              <div className="dash-email">{session.user?.email}</div>
+              <div className="dash-name">{user.name}</div>
+              <div className="dash-email">{user.email}</div>
             </div>
           </div>
+          {source === "extension" && (
+            <p style={{ color: "var(--accent)", fontSize: 12, marginTop: 10 }}>
+              ✓ Signed in via your NexSion extension in this browser
+            </p>
+          )}
           <p style={{ color: "var(--muted)", fontSize: 12.5, marginTop: 14 }}>
-            This is your website account. Your actual boards, pages, and
-            wallpapers live in the NexSion extension itself (synced to this
-            same Google account) — this dashboard doesn't read or change
-            them.
+            Your actual boards, pages, and wallpapers live in the extension
+            itself (synced to this same account) — this dashboard doesn't
+            read or change them.
           </p>
         </div>
 

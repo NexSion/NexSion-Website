@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useNexSionAuth } from "./Providers";
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
+  const { user, loading, signIn, signOut } = useNexSionAuth();
 
   return (
     <header className="nav">
@@ -20,30 +20,25 @@ export default function Navbar() {
           <a href="/api/download" className="nav-btn">
             Get the extension
           </a>
-          {status === "authenticated" ? (
+          {!loading && user ? (
             <>
               <Link href="/dashboard">Dashboard</Link>
               <div className="nav-user">
-                {session.user?.image && (
+                {user.picture && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    className="nav-avatar"
-                    src={session.user.image}
-                    alt=""
-                  />
+                  <img className="nav-avatar" src={user.picture} alt="" />
                 )}
-                <button className="nav-btn" onClick={() => signOut()}>
+                <button className="nav-btn" onClick={signOut}>
                   Sign out
                 </button>
               </div>
             </>
           ) : (
-            <button
-              className="nav-btn nav-btn-accent"
-              onClick={() => signIn("google")}
-            >
-              Sign in
-            </button>
+            !loading && (
+              <button className="nav-btn nav-btn-accent" onClick={signIn}>
+                Sign in
+              </button>
+            )
           )}
         </nav>
       </div>

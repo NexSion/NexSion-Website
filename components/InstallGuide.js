@@ -110,34 +110,79 @@ export default function InstallGuide() {
   return (
     <section className="install container" id="install">
       <div className="section-head">
-        <h2>Install it in a minute</h2>
+        <span className="eyebrow" style={{ marginBottom: 14 }}>
+          Get started
+        </span>
+        <h2>
+          Install it <span style={{ color: "var(--accent)" }}>in a minute</span>
+        </h2>
         <p>
           NexSion isn&apos;t on the Chrome Web Store yet, so it installs the
           same way any developer extension does.
         </p>
       </div>
-      <div className="install-steps" ref={containerRef}>
-        {STEPS.map((step, i) => {
-          const Icon = step.icon;
-          return (
-            <div
-              className="install-step"
-              key={step.title}
-              style={{ transitionDelay: `${i * 70}ms` }}
-            >
-              <span className="install-step-num">{i + 1}</span>
-              <span className="install-step-icon">
-                <Icon />
-              </span>
-              <div className="install-step-body">
-                <h4>{step.title}</h4>
-                <p>{step.text}</p>
+
+      <div className="install-grid">
+        <div className="install-steps" ref={containerRef}>
+          {STEPS.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <div
+                className="install-step"
+                key={step.title}
+                style={{ transitionDelay: `${i * 70}ms` }}
+              >
+                <span className="install-step-num">{i + 1}</span>
+                <span className="install-step-icon">
+                  <Icon />
+                </span>
+                <div className="install-step-body">
+                  <h4>{step.title}</h4>
+                  <p>{step.text}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Illustrative preview only — not a real screenshot. Swap this
+            block for actual <img> screenshots of the extension whenever
+            you have some. */}
+        <div className="browser-mock">
+          <div className="browser-mock-bar">
+            <div className="browser-mock-dots">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className="browser-mock-address">New Tab</div>
+          </div>
+          <div className="browser-mock-body">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" className="mock-logo" />
+            <div className="mock-search">🔍 Search anything…</div>
+            <div className="mock-app-row">
+              <span className="mock-app-icon">📺</span>
+              <span className="mock-app-icon">💬</span>
+              <span className="mock-app-icon">🎮</span>
+              <span className="mock-app-icon">📝</span>
+              <span className="mock-app-icon">🎵</span>
+            </div>
+            <div className="mock-footer-row">
+              <div className="mock-clock">
+                Mon
+                <strong>10:24</strong>
+              </div>
+              <div className="mock-weather">
+                Partly cloudy
+                <strong>28°C</strong>
               </div>
             </div>
-          );
-        })}
+          </div>
+        </div>
       </div>
-      <div style={{ textAlign: "center", marginTop: 30 }}>
+
+      <div style={{ textAlign: "center", marginTop: 34 }}>
         <a className="btn btn-primary" href="/api/download">
           Get NexSion — Free
         </a>
